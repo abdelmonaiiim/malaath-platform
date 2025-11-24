@@ -7,12 +7,11 @@ import {
   BookOpen, Eye, Copy, Check, Lock
 } from 'lucide-react';
 
+// --- استيراد المكونات والبيانات ---
 import Logo from './components/Logo';
 import WhatsAppBtn from './components/WhatsAppBtn';
-// استيراد المولد الجديد
 import CodeGenerator from './components/CodeGenerator'; 
 
-// استيراد البيانات الثابتة فقط
 import { BOOKS_DATA } from './data/books';
 import { ARTICLES_DATA } from './data/articles';
 import { ACTIVITIES_DATA } from './data/activities';
@@ -25,7 +24,7 @@ const handleShare = async (title, text, url = window.location.href) => {
   } else { navigator.clipboard.writeText(url); alert('تم نسخ الرابط للحافظة!'); }
 };
 
-// --- مكون الرأس (Header) ---
+// --- 1. مكون الرأس (Header) ---
 const Header = ({ activePage, setPage, searchQuery, setSearchQuery }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -114,11 +113,10 @@ const Header = ({ activePage, setPage, searchQuery, setSearchQuery }) => {
   );
 };
 
-// --- مكون الفوتر مع الزر السري ---
+// --- 2. Footer ---
 const Footer = ({ setPage }) => (
   <footer className="bg-stone-900 text-stone-400 pt-16 pb-8 border-t border-stone-800 font-sans">
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* ... نفس محتوى الفوتر السابق ... */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
         <div className="md:col-span-2">
           <div className="flex items-center gap-3 mb-6">
@@ -132,12 +130,24 @@ const Footer = ({ setPage }) => (
             مشروع ثقافي طموح انطلق من الأرشيف الغني للأديب بوسلهام عميمر.
           </p>
         </div>
+
         <div>
           <h4 className="text-white font-bold mb-6 font-serif text-lg border-b border-stone-800 pb-2 inline-block">روابط المنصة</h4>
           <ul className="space-y-3 text-sm">
              <li><button onClick={() => setPage('home')}>الرئيسية</button></li>
              <li><button onClick={() => setPage('books')}>المكتبة الرقمية</button></li>
+             <li><button onClick={() => setPage('about')}>عن المؤسس</button></li>
           </ul>
+        </div>
+
+        <div>
+          <h4 className="text-white font-bold mb-6 font-serif text-lg border-b border-stone-800 pb-2 inline-block">دعم المنصة</h4>
+          <p className="text-sm mb-4 text-stone-400">
+            لضمان استمرارية هذا الملاذ الثقافي مجانياً للجميع.
+          </p>
+          <button className="flex items-center gap-2 bg-stone-800 border border-stone-700 px-4 py-2 rounded-lg hover:bg-amber-700 hover:border-amber-600 hover:text-white transition-all text-xs text-stone-300 w-full justify-center">
+            <Heart size={14} className="fill-current" /> مساهمة في المشروع
+          </button>
         </div>
       </div>
 
@@ -145,7 +155,6 @@ const Footer = ({ setPage }) => (
         <p>© {new Date().getFullYear()} منصة ملاذ الثقافية.</p>
         <div className="flex items-center gap-4">
             <p>برعاية وتأسيس الأديب <span className="text-amber-500 font-bold">بوسلهام عميمر</span></p>
-            {/* الزر السري للوحة التحكم */}
             <button 
               onClick={() => setPage('admin-gen')} 
               className="opacity-10 hover:opacity-100 transition-opacity p-2"
@@ -159,169 +168,255 @@ const Footer = ({ setPage }) => (
   </footer>
 );
 
-// ... (HomePage, BooksPage, BookDetailView, ArticlesPage, ArticleReader, etc. remain exactly same as before) ...
-// سأضع هنا فقط التغيير في المكون الرئيسي App لربط صفحة الأدمن الجديدة
+// --- 3. الصفحات (Pages) ---
 
 const HomePage = ({ setPage, setArticle, setBook }) => (
-    <div className="animate-fade-in">
-      <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-[#fdfbf7]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="text-center lg:text-right">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-stone-900 text-amber-50 text-xs font-bold mb-6 shadow-md border border-stone-700">
-                <Globe size={14} className="animate-pulse" /> انطلاقة جديدة للأدب الهادف
+  <div className="animate-fade-in">
+    {/* Hero */}
+    <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-[#fdfbf7]">
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-amber-200/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-0 w-64 h-64 bg-stone-200/30 rounded-full blur-3xl"></div>
+        <div className="absolute top-20 left-20 opacity-5 text-9xl font-serif text-stone-900 rotate-12">م</div>
+        <div className="absolute bottom-20 right-40 opacity-5 text-9xl font-serif text-stone-900 -rotate-12">ذ</div>
+      </div>
+      
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="text-center lg:text-right">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-stone-900 text-amber-50 text-xs font-bold mb-6 shadow-md border border-stone-700">
+              <Globe size={14} className="animate-pulse" /> انطلاقة جديدة للأدب الهادف
+            </div>
+            <h1 className="text-5xl lg:text-7xl font-bold text-stone-900 leading-tight font-serif mb-6">
+              مَلاذ<span className="text-amber-600">.</span>
+            </h1>
+            <p className="text-lg text-stone-600 leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0 font-light border-r-4 border-amber-500 pr-4 bg-white/50 py-2">
+              منصة ثقافية جامعة، انطلقت من الأرشيف الثري للأديب والمربي <strong>بوسلهام عميمر</strong>.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+              <button onClick={() => setPage('books')} className="px-8 py-4 bg-stone-900 text-white rounded-xl font-bold hover:bg-stone-800 transition-all shadow-xl flex items-center justify-center gap-3">
+                <Book size={20} /> تصفح مكتبة المؤسس
+              </button>
+            </div>
+          </div>
+
+          {/* Founder Spotlight Card - تم تعديل هذا الجزء ليظهر على الموبايل */}
+          <div className="relative mt-12 lg:mt-0 block"> 
+            <div className="absolute inset-0 bg-stone-900 rounded-2xl -rotate-3 opacity-5 scale-105"></div>
+            <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden border border-stone-100 group">
+              <div className="bg-stone-900 p-6 flex justify-between items-center text-white">
+                <div>
+                   <span className="text-xs text-amber-500 font-bold uppercase">مؤسس المنصة</span>
+                   <h3 className="text-2xl font-serif font-bold mt-1">بوسلهام عميمر</h3>
+                </div>
+                <PenTool className="text-stone-700 w-12 h-12" />
               </div>
-              <h1 className="text-5xl lg:text-7xl font-bold text-stone-900 leading-tight font-serif mb-6">
-                مَلاذ<span className="text-amber-600">.</span>
-              </h1>
-              <p className="text-lg text-stone-600 leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0 font-light border-r-4 border-amber-500 pr-4 bg-white/50 py-2">
-                منصة ثقافية جامعة، انطلقت من الأرشيف الثري للأديب والمربي <strong>بوسلهام عميمر</strong>.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <button onClick={() => setPage('books')} className="px-8 py-4 bg-stone-900 text-white rounded-xl font-bold hover:bg-stone-800 transition-all shadow-xl flex items-center justify-center gap-3">
-                  <Book size={20} /> تصفح مكتبة المؤسس
+              <div className="p-8">
+                <div className="flex gap-4 mb-6">
+                   <div className="w-24 h-32 bg-stone-200 rounded shadow-lg flex-shrink-0 overflow-hidden">
+                      <img src={BOOKS_DATA[0].coverImage} alt={BOOKS_DATA[0].title} className="w-full h-full object-cover" />
+                   </div>
+                   <div className="flex-1">
+                      <h4 className="font-bold text-lg mb-2">أحدث الإصدارات: {BOOKS_DATA[0].title}</h4>
+                      <p className="text-sm text-stone-500 line-clamp-3">
+                        {BOOKS_DATA[0].description}
+                      </p>
+                   </div>
+                </div>
+                <button onClick={() => { setBook(BOOKS_DATA[0]); setPage('book-detail'); }} className="w-full py-3 bg-stone-100 text-stone-800 font-bold rounded-lg hover:bg-amber-500 hover:text-white transition-colors">
+                  قراءة المزيد
                 </button>
               </div>
-            </div>
-            {/* Featured Book */}
-            <div className="relative hidden lg:block">
-                <div className="absolute inset-0 bg-stone-900 rounded-2xl -rotate-3 opacity-5 scale-105"></div>
-                <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden border border-stone-100 group">
-                <div className="bg-stone-900 p-6 flex justify-between items-center text-white">
-                    <div><span className="text-xs text-amber-500 font-bold uppercase">مؤسس المنصة</span><h3 className="text-2xl font-serif font-bold mt-1">بوسلهام عميمر</h3></div>
-                    <PenTool className="text-stone-700 w-12 h-12" />
-                </div>
-                <div className="p-8">
-                    <div className="flex gap-4 mb-6">
-                    <div className="w-24 h-32 bg-stone-200 rounded shadow-lg flex-shrink-0 overflow-hidden">
-                        <img src={BOOKS_DATA[0].coverImage} alt={BOOKS_DATA[0].title} className="w-full h-full object-cover" />
-                    </div>
-                    <div className="flex-1">
-                        <h4 className="font-bold text-lg mb-2">أحدث الإصدارات: {BOOKS_DATA[0].title}</h4>
-                        <p className="text-sm text-stone-500 line-clamp-3">{BOOKS_DATA[0].description}</p>
-                    </div>
-                    </div>
-                    <button onClick={() => { setBook(BOOKS_DATA[0]); setPage('book-detail'); }} className="w-full py-3 bg-stone-100 text-stone-800 font-bold rounded-lg hover:bg-amber-500 hover:text-white transition-colors">قراءة المزيد</button>
-                </div>
-                </div>
             </div>
           </div>
         </div>
-      </section>
-      {/* ... Rest of HomePage sections (Timeline, etc) ... */}
-    </div>
+      </div>
+    </section>
+    {/* ... باقي الأقسام ... */}
+  </div>
 );
 
+// ... BooksPage (كما هي)
 const BooksPage = ({ setPage, setBook, searchQuery }) => {
-    const filteredBooks = BOOKS_DATA.filter(book => 
-      book.title.includes(searchQuery) || 
-      book.description.includes(searchQuery)
-    );
-  
-    return (
-      <div className="pt-24 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 animate-fade-in">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl font-bold text-stone-900 font-serif mb-4">المكتبة الرقمية</h2>
-          <p className="text-stone-600 max-w-2xl mx-auto">مجموعة الأعمال الكاملة للمؤسس.</p>
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-          {filteredBooks.map((book) => (
-            <div key={book.id} className="group bg-white rounded-2xl border border-stone-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden">
-              <div className={`h-80 bg-stone-100 flex items-center justify-center p-4 relative overflow-hidden`}>
-                 <img src={book.coverImage} alt={book.title} className="h-64 w-auto shadow-2xl transform group-hover:-translate-y-4 group-hover:scale-105 transition-all duration-500 object-cover rounded-sm" />
-                 {book.videoUrl && (<div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm p-2 rounded-full text-white animate-pulse z-10"><PlayCircle size={20} /></div>)}
-              </div>
-              <div className="p-6 flex flex-col flex-grow">
-                <h3 className="text-xl font-bold text-stone-900 font-serif mb-3">{book.title}</h3>
-                <button onClick={() => { setBook(book); setPage('book-detail'); }} className="w-full py-3 bg-stone-900 text-white rounded-lg font-medium flex items-center justify-center gap-2">
-                  <Book size={18} /> عرض التفاصيل
-                </button>
-              </div>
+  const filteredBooks = BOOKS_DATA.filter(book => 
+    book.title.includes(searchQuery) || 
+    book.description.includes(searchQuery) ||
+    book.category.includes(searchQuery)
+  );
+
+  return (
+    <div className="pt-24 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 animate-fade-in">
+      <div className="text-center mb-16">
+        <h2 className="text-4xl font-bold text-stone-900 font-serif mb-4">المكتبة الرقمية</h2>
+        <p className="text-stone-600 max-w-2xl mx-auto">مجموعة الأعمال الكاملة للمؤسس.</p>
+        {searchQuery && <p className="mt-4 text-amber-600 text-sm bg-amber-50 inline-block px-4 py-1 rounded-full">نتائج البحث عن: "{searchQuery}"</p>}
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
+        {filteredBooks.map((book) => (
+          <div key={book.id} className="group bg-white rounded-2xl border border-stone-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden">
+            <div className={`h-80 bg-stone-100 flex items-center justify-center p-4 relative overflow-hidden`}>
+               <img src={book.coverImage} alt={book.title} className="h-64 w-auto shadow-2xl transform group-hover:-translate-y-4 group-hover:scale-105 transition-all duration-500 object-cover rounded-sm" />
+               {book.videoUrl && (<div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm p-2 rounded-full text-white animate-pulse z-10"><PlayCircle size={20} /></div>)}
             </div>
-          ))}
+            <div className="p-6 flex flex-col flex-grow">
+              <div className="flex justify-between items-start mb-2">
+                 <span className="text-xs font-bold text-amber-700 uppercase tracking-wider bg-amber-50 px-2 py-1 rounded">{book.category}</span>
+                 <span className="text-xs text-stone-400 font-mono">{book.year}</span>
+              </div>
+              <h3 className="text-xl font-bold text-stone-900 font-serif mb-3">{book.title}</h3>
+              <p className="text-stone-500 text-sm line-clamp-3 mb-6 flex-grow">{book.description}</p>
+              <button onClick={() => { setBook(book); setPage('book-detail'); }} className="w-full py-3 bg-stone-900 text-white rounded-lg font-medium hover:bg-stone-800 transition-colors flex items-center justify-center gap-2">
+                <Book size={18} /> عرض التفاصيل
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ... BookDetailView (كما هي)
+const BookDetailView = ({ book, setPage }) => {
+  const [isReading, setIsReading] = useState(false);
+  const shareBook = () => handleShare(`كتاب: ${book.title}`, `أدعوك لقراءة كتاب "${book.title}"`);
+
+  return (
+    <div className="pt-24 pb-20 bg-white animate-fade-in relative">
+      {isReading && (
+        <div className="fixed inset-0 z-[60] bg-stone-900/95 backdrop-blur-sm flex flex-col animate-fade-in">
+          <div className="flex justify-between items-center p-4 bg-stone-900 border-b border-stone-800 text-white">
+            <button onClick={() => setIsReading(false)} className="p-2"><X size={24} /></button>
+          </div>
+          <div className="flex-1 w-full h-full bg-stone-800 flex items-center justify-center p-4">
+             {book.pdfUrl ? <iframe src={book.pdfUrl} className="w-full h-full max-w-5xl bg-white rounded shadow-2xl"></iframe> : <p className="text-stone-400">عذراً، النسخة الرقمية غير متوفرة.</p>}
+          </div>
+        </div>
+      )}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <button onClick={() => setPage('books')} className="flex items-center gap-2 text-stone-500 mb-8"><ChevronRight size={20} /> عودة</button>
+        <div className="grid lg:grid-cols-12 gap-12">
+          <div className="lg:col-span-4"><img src={book.coverImage} className="w-full rounded shadow-2xl" /></div>
+          <div className="lg:col-span-8">
+            <h1 className="text-4xl font-bold font-serif mb-6">{book.title}</h1>
+            <p className="prose prose-lg mb-8">{book.description}</p>
+            <div className="flex gap-4 mb-8">
+              {book.pdfUrl && <button onClick={() => setIsReading(true)} className="flex-1 bg-stone-900 text-white py-3 rounded flex justify-center gap-2"><Eye /> طالع الكتاب</button>}
+              <button onClick={shareBook} className="px-6 border rounded flex justify-center gap-2 items-center"><Share2 /> مشاركة</button>
+            </div>
+            {book.videoUrl && <div className="aspect-video w-full bg-black rounded overflow-hidden"><iframe className="w-full h-full" src={`${book.videoUrl}?rel=0&modestbranding=1`} allowFullScreen></iframe></div>}
+          </div>
         </div>
       </div>
-    );
+    </div>
+  );
 };
 
-const BookDetailView = ({ book, setPage }) => {
-    const [isReading, setIsReading] = useState(false);
-    const shareBook = () => handleShare(`كتاب: ${book.title}`, `أدعوك لقراءة كتاب "${book.title}"`);
-
-    return (
-        <div className="pt-24 pb-20 bg-white animate-fade-in relative">
-            {isReading && (
-                <div className="fixed inset-0 z-[60] bg-stone-900/95 backdrop-blur-sm flex flex-col animate-fade-in">
-                     <div className="flex justify-between items-center p-4 bg-stone-900 border-b border-stone-800 text-white">
-                        <button onClick={() => setIsReading(false)}><X size={24} /></button>
-                     </div>
-                     <div className="flex-1 w-full h-full bg-stone-800 flex items-center justify-center p-4">
-                        <iframe src={book.pdfUrl} className="w-full h-full max-w-5xl bg-white rounded shadow-2xl"></iframe>
-                     </div>
-                </div>
-            )}
-             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-                 <button onClick={() => setPage('books')} className="flex items-center gap-2 text-stone-500 mb-8"><ChevronRight size={20} /> عودة</button>
-                 <div className="grid lg:grid-cols-12 gap-12">
-                    <div className="lg:col-span-4"><img src={book.coverImage} className="w-full rounded shadow-2xl" /></div>
-                    <div className="lg:col-span-8">
-                        <h1 className="text-4xl font-bold font-serif mb-6">{book.title}</h1>
-                        <p className="prose prose-lg mb-8">{book.description}</p>
-                        <div className="flex gap-4">
-                            {book.pdfUrl && <button onClick={() => setIsReading(true)} className="flex-1 bg-stone-900 text-white py-3 rounded flex justify-center gap-2"><Eye /> قراءة</button>}
-                            <button onClick={shareBook} className="px-6 border rounded flex justify-center gap-2 items-center"><Share2 /> مشاركة</button>
-                        </div>
-                        {book.videoUrl && (
-                            <div className="mt-8 aspect-video w-full bg-black rounded overflow-hidden">
-                                <iframe className="w-full h-full" src={`${book.videoUrl}?rel=0&modestbranding=1`} frameBorder="0" allowFullScreen></iframe>
-                            </div>
-                        )}
-                    </div>
-                 </div>
-             </div>
-        </div>
-    );
-};
-
+// ... ArticlesPage (كما هي)
 const ArticlesPage = ({ setPage, setArticle, searchQuery }) => {
-    const filtered = ARTICLES_DATA.filter(a => a.title.includes(searchQuery));
-    return (
-        <div className="pt-24 pb-20 max-w-7xl mx-auto px-4">
-             <div className="grid lg:grid-cols-3 gap-8">
-                {filtered.map(article => (
-                    <div key={article.id} onClick={() => {
-                        if(article.url) window.open(article.url, '_blank');
-                        else { setArticle(article); setPage('article-detail'); }
-                    }} className="bg-white border rounded-xl p-6 cursor-pointer hover:shadow-lg">
-                        <h3 className="text-xl font-bold font-serif mb-2">{article.title}</h3>
-                        <div className="flex justify-between text-xs text-stone-400 mt-4">
-                            <span>{article.date}</span>
-                            {article.url && <ExternalLink size={14} />}
-                        </div>
-                    </div>
-                ))}
+  const filtered = ARTICLES_DATA.filter(a => a.title.includes(searchQuery));
+  return (
+    <div className="pt-24 pb-20 max-w-7xl mx-auto px-4">
+      <div className="grid lg:grid-cols-3 gap-8">
+        {filtered.map(article => (
+          <div key={article.id} onClick={() => {
+             if(article.url) window.open(article.url, '_blank');
+             else { setArticle(article); setPage('article-detail'); }
+          }} className="bg-white border rounded-xl p-6 cursor-pointer hover:shadow-lg">
+             <h3 className="text-xl font-bold font-serif mb-2">{article.title}</h3>
+             <div className="flex justify-between text-xs text-stone-400 mt-4"><span>{article.date}</span>{article.url && <ExternalLink size={14} />}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ... ArticleReader (كما هي)
+const ArticleReader = ({ article, setPage }) => (
+  <div className="pt-24 pb-20 max-w-3xl mx-auto px-4">
+    <button onClick={() => setPage('articles')} className="mb-8">عودة</button>
+    <h1 className="text-3xl font-bold font-serif mb-6">{article.title}</h1>
+    <div className="prose prose-lg">{article.content}</div>
+  </div>
+);
+
+// ... ActivitiesPage (الكاملة)
+const ActivitiesPage = () => (
+  <div className="pt-24 pb-20 bg-stone-900 min-h-screen text-stone-100 animate-fade-in">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="text-center mb-16">
+        <Mic className="text-amber-500 w-12 h-12 mx-auto mb-4" />
+        <h2 className="text-4xl font-bold text-white font-serif mb-4">أرشيف الأنشطة واللقاءات</h2>
+      </div>
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {ACTIVITIES_DATA.map(item => (
+           <div key={item.id} className="bg-stone-800 rounded-xl overflow-hidden">
+             <div className="aspect-[4/3] overflow-hidden"><img src={item.imageUrl || item.thumbnail} className="w-full h-full object-cover opacity-80 hover:opacity-100 transition" /></div>
+             <div className="p-6"><h4 className="font-bold mb-2">{item.title}</h4><p className="text-sm text-stone-400">{item.description}</p></div>
+           </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+// ... AboutPage (الكاملة مع التايم لاين)
+const AboutPage = () => (
+  <div className="pt-24 pb-20 bg-white animate-fade-in">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="text-center mb-20">
+        <div className="w-32 h-32 bg-stone-200 rounded-full mx-auto mb-6 overflow-hidden border-4 border-white shadow-xl relative">
+           <div className="w-full h-full flex items-center justify-center bg-stone-800 text-amber-50 text-4xl font-serif">ب</div>
+        </div>
+        <h2 className="text-4xl font-bold text-stone-900 font-serif mb-3">بوسلهام عميمر</h2>
+      </div>
+      <div className="prose prose-stone prose-lg mx-auto mb-20 bg-[#fdfbf7] p-8 rounded-2xl">
+        <p>صوت مغربي أصيل، كرس حياته المهنية والإبداعية للدفاع عن قيم المدرسة العمومية...</p>
+      </div>
+      <div className="relative border-r-2 border-stone-200 mr-4 md:mr-0 md:mx-auto max-w-3xl space-y-12">
+        {TIMELINE_DATA.map((item, index) => {
+          const Icon = item.icon;
+          return (
+            <div key={index} className="relative flex items-start gap-6 group">
+              <div className="absolute -right-[9px] top-0 w-4 h-4 rounded-full bg-stone-200 border-2 border-white"></div>
+              <div className="flex-1 bg-white p-6 rounded-xl border border-stone-100 shadow-sm">
+                <div className="flex items-center gap-3 mb-2"><span className="text-sm font-bold text-amber-600 font-mono">{item.year}</span></div>
+                <h3 className="text-xl font-bold text-stone-900 font-serif mb-2">{item.title}</h3>
+                <p className="text-stone-500 text-sm">{item.description}</p>
+              </div>
             </div>
+          );
+        })}
+      </div>
+    </div>
+  </div>
+);
+
+// ... ContactPage (الكاملة)
+const ContactPage = () => (
+  <div className="pt-24 pb-20 bg-stone-50 animate-fade-in min-h-[80vh] flex items-center">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+      <div className="bg-white rounded-3xl shadow-xl overflow-hidden grid md:grid-cols-2">
+        <div className="bg-stone-900 p-12 text-white flex flex-col justify-between">
+            <div><h2 className="text-3xl font-bold font-serif mb-6">تواصل مع المؤسس</h2><p className="text-stone-300">نرحب بآرائكم...</p></div>
+            <div className="space-y-6"><div className="flex items-center gap-4"><Mail /> contact@malaath.com</div></div>
         </div>
-    );
-};
-
-const ArticleReader = ({ article, setPage }) => {
-    return (
-        <div className="pt-24 pb-20 max-w-3xl mx-auto px-4">
-            <button onClick={() => setPage('articles')} className="mb-8">عودة</button>
-            <h1 className="text-3xl font-bold font-serif mb-6">{article.title}</h1>
-            <div className="prose prose-lg">{article.content}</div>
+        <div className="p-12">
+          <form className="space-y-6">
+            <input type="text" className="w-full p-3 border rounded" placeholder="الاسم الكامل" />
+            <input type="email" className="w-full p-3 border rounded" placeholder="البريد الإلكتروني" />
+            <textarea rows="4" className="w-full p-3 border rounded" placeholder="الرسالة..."></textarea>
+            <button className="w-full bg-stone-900 text-white py-4 rounded hover:bg-amber-700">إرسال</button>
+          </form>
         </div>
-    );
-};
-
-const ActivitiesPage = () => (<div className="pt-32 text-center">صفحة الأنشطة (قيد التطوير)</div>);
-const AboutPage = () => (<div className="pt-32 text-center">صفحة المؤسس (قيد التطوير)</div>);
-const ContactPage = () => (<div className="pt-32 text-center">صفحة التواصل (قيد التطوير)</div>);
-
+      </div>
+    </div>
+  </div>
+);
 
 // --- Main App ---
-
 const App = () => {
   const [page, setPage] = useState('home');
   const [selectedArticle, setSelectedArticle] = useState(null);
@@ -340,7 +435,7 @@ const App = () => {
       case 'activities': return <ActivitiesPage />;
       case 'about': return <AboutPage />;
       case 'contact': return <ContactPage />;
-      case 'admin-gen': return <CodeGenerator />; // صفحة الأدمن السرية
+      case 'admin-gen': return <CodeGenerator />; 
       default: return <HomePage setPage={setPage} />;
     }
   };
