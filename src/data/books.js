@@ -25,7 +25,7 @@ export const BOOKS_DATA = [
     pages: 240,
     publisher: "دار النشر المغربية",
     description: "رحلة سردية توثق الروابط التاريخية والوجدانية مع الصحراء المغربية، بأسلوب يجمع بين التوثيق والأدب.",
-    coverImage: "/images/sahra.jpg",
+    coverImage: "/images/sahrai.jpg",
     // مثال لكتاب ليس له ملف PDF بعد
     pdfUrl: "", 
   },
