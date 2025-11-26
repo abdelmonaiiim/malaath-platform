@@ -314,24 +314,136 @@ const BookDetailView = ({ book, setPage }) => {
 };
 
 // ... ArticlesPage (كما هي)
+// ... (باقي الكود في الأعلى كما هو) ...
+
+// === تحديث جذري لمكون صفحة المقالات ===
 const ArticlesPage = ({ setPage, setArticle, searchQuery }) => {
-  const filtered = ARTICLES_DATA.filter(a => a.title.includes(searchQuery));
+  // حالة جديدة: هل اخترنا تصنيفاً أم لا؟ (null = لا يوجد اختيار، يعني اعرض التصنيفات)
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  
+  // التأكد من وجود البيانات
+  const safeArticles = ARTICLES_DATA || [];
+
+  // قائمة التصنيفات مع أيقونات وألوان مميزة
+  const categories = [
+    { id: 'تعليم وتربية', title: 'التعليم والتربية', icon: Users, color: 'bg-blue-50 text-blue-700 border-blue-200', count: safeArticles.filter(a => a.category === 'تعليم وتربية').length },
+    { id: 'قضايا المجتمع والسياسة', title: 'المجتمع والسياسة', icon: Globe, color: 'bg-emerald-50 text-emerald-700 border-emerald-200', count: safeArticles.filter(a => a.category === 'قضايا المجتمع والسياسة').length },
+    { id: 'نقد أدبي وفني', title: 'النقد الأدبي والفني', icon: PenTool, color: 'bg-rose-50 text-rose-700 border-rose-200', count: safeArticles.filter(a => a.category === 'نقد أدبي وفني').length },
+    { id: 'فكر وثقافة', title: 'فكر وثقافة', icon: BookOpen, color: 'bg-amber-50 text-amber-700 border-amber-200', count: safeArticles.filter(a => a.category === 'فكر وثقافة').length },
+  ];
+
+  // تصفية المقالات حسب التصنيف المختار (أو البحث)
+  const filtered = safeArticles.filter(a => {
+    const matchesSearch = (a.title && a.title.includes(searchQuery)) || (a.category && a.category.includes(searchQuery));
+    const matchesCategory = selectedCategory ? a.category === selectedCategory : true;
+    return matchesSearch && matchesCategory;
+  });
+
   return (
-    <div className="pt-24 pb-20 max-w-7xl mx-auto px-4">
-      <div className="grid lg:grid-cols-3 gap-8">
-        {filtered.map(article => (
-          <div key={article.id} onClick={() => {
-             if(article.url) window.open(article.url, '_blank');
-             else { setArticle(article); setPage('article-detail'); }
-          }} className="bg-white border rounded-xl p-6 cursor-pointer hover:shadow-lg">
-             <h3 className="text-xl font-bold font-serif mb-2">{article.title}</h3>
-             <div className="flex justify-between text-xs text-stone-400 mt-4"><span>{article.date}</span>{article.url && <ExternalLink size={14} />}</div>
-          </div>
-        ))}
+    <div className="pt-24 pb-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 animate-fade-in">
+      
+      {/* العنوان والبحث */}
+      <div className="flex flex-col md:flex-row justify-between items-end mb-12 border-b border-stone-200 pb-8">
+        <div>
+          <h2 className="text-4xl font-bold text-stone-900 font-serif mb-3">أرشيف المقالات</h2>
+          <p className="text-stone-500">
+            {selectedCategory ? `تصفح مقالات: ${selectedCategory}` : 'اختر تصنيفاً لتصفح المقالات'}
+          </p>
+        </div>
+        
+        {/* زر العودة للتصنيفات (يظهر فقط عند اختيار تصنيف) */}
+        {selectedCategory && (
+          <button 
+            onClick={() => setSelectedCategory(null)} 
+            className="mt-4 md:mt-0 flex items-center gap-2 text-stone-500 hover:text-amber-700 transition-colors"
+          >
+            <ChevronRight size={20} /> عودة للتصنيفات
+          </button>
+        )}
       </div>
+
+      {/* === عرض التصنيفات (فقط إذا لم نختر تصنيفاً بعد) === */}
+      {!selectedCategory && !searchQuery && (
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {categories.map((cat) => {
+            const Icon = cat.icon;
+            return (
+              <div 
+                key={cat.id}
+                onClick={() => setSelectedCategory(cat.id)}
+                className={`p-8 rounded-2xl border ${cat.color} cursor-pointer hover:shadow-lg transition-all duration-300 group flex flex-col items-center text-center h-48 justify-center`}
+              >
+                <div className="mb-4 p-4 bg-white rounded-full shadow-sm group-hover:scale-110 transition-transform">
+                  <Icon size={32} />
+                </div>
+                <h3 className="font-bold text-lg mb-1">{cat.title}</h3>
+                <span className="text-xs opacity-75 bg-white/50 px-2 py-1 rounded-full">{cat.count} مقال</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* === عرض قائمة المقالات (عند اختيار تصنيف أو البحث) === */}
+      {(selectedCategory || searchQuery) && (
+        <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-8 animate-fade-in">
+          {filtered.map((article) => (
+            <div 
+              key={article.id}
+              onClick={() => {
+                if (article.url) {
+                   window.open(article.url, '_blank', 'noopener,noreferrer');
+                } else {
+                   setArticle(article); 
+                   setPage('article-detail');
+                }
+              }}
+              className="bg-white border border-stone-200 rounded-xl p-6 cursor-pointer hover:shadow-lg hover:border-amber-300 transition-all duration-300 group flex flex-col h-full relative"
+            >
+               <div className="flex justify-between items-start mb-4">
+                  <span className={`text-[10px] font-bold px-2 py-1 rounded bg-stone-50 text-stone-600 group-hover:bg-amber-50 group-hover:text-amber-700 transition-colors`}>
+                    {article.category}
+                  </span>
+                  {article.url && (
+                    <a 
+                      href={article.url} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-stone-300 group-hover:text-amber-500 hover:scale-110 transition-transform p-1"
+                    >
+                      <ExternalLink size={16} />
+                    </a>
+                  )}
+               </div>
+               <h3 className="text-xl font-bold text-stone-900 font-serif mb-3 leading-snug group-hover:text-amber-800 transition-colors flex-grow">
+                 {article.title}
+               </h3>
+               <p className="text-stone-500 text-sm line-clamp-2 mb-6">
+                 {article.content}
+               </p>
+               <div className="pt-4 border-t border-stone-50 flex justify-between text-xs text-stone-400 font-mono mt-auto">
+                  <span className="flex items-center gap-1"><Calendar size={12} /> {article.date}</span>
+                  <span>{article.source}</span>
+               </div>
+            </div>
+          ))}
+        </div>
+      )}
+      
+      {/* رسالة عند عدم وجود نتائج */}
+      {(selectedCategory || searchQuery) && filtered.length === 0 && (
+        <div className="text-center py-20">
+          <FileText size={48} className="mx-auto text-stone-200 mb-4" />
+          <p className="text-stone-500">لا توجد مقالات في هذا التصنيف حالياً.</p>
+          <button onClick={() => setSelectedCategory(null)} className="mt-4 text-amber-700 underline">عودة للتصنيفات</button>
+        </div>
+      )}
     </div>
   );
 };
+
+// ... (باقي الكود في الأسفل كما هو) ...
 
 // ... ArticleReader (كما هي)
 const ArticleReader = ({ article, setPage }) => (
