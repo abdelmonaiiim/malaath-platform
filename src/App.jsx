@@ -16,6 +16,8 @@ import { BOOKS_DATA } from './data/books';
 import { ARTICLES_DATA } from './data/articles';
 import { ACTIVITIES_DATA } from './data/activities';
 import { TIMELINE_DATA } from './data/timeline';
+import ImageCarousel from './components/ImageCarousel'; // استيراد المكون
+import { GALLERY_IMAGES } from './data/gallery'; // استيراد الصور
 
 // --- دالة المشاركة ---
 const handleShare = async (title, text, url = window.location.href) => {
@@ -172,7 +174,29 @@ const Footer = ({ setPage }) => (
 
 const HomePage = ({ setPage, setArticle, setBook }) => (
   <div className="animate-fade-in">
-    {/* Hero */}
+    {/* Hero */
+    
+    }
+    // ... (داخل مكون HomePage، بعد إغلاق وسم section الخاص بالـ Hero مباشرة)
+
+    {/* قسم معرض الصور المتحرك */}
+    <section className="py-16 bg-white relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl font-bold text-stone-900 font-serif mb-4">جولات في رحاب المعرفة</h2>
+          <div className="w-20 h-1 bg-amber-500 mx-auto rounded-full mb-4"></div>
+          <p className="text-stone-500 max-w-2xl mx-auto">
+            جانب من اللقاءات التواصلية، حفلات التوقيع، والورشات التربوية التي أطرها الكاتب في مختلف المؤسسات التعليمية والثقافية.
+          </p>
+        </div>
+        
+        {/* استدعاء المكون هنا */}
+        <ImageCarousel images={GALLERY_IMAGES} />
+        
+      </div>
+    </section>
+
+
     <section className="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden bg-[#fdfbf7]">
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-amber-200/20 rounded-full blur-3xl"></div>
