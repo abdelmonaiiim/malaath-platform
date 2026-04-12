@@ -47,5 +47,18 @@ export const BOOKS_DATA = [
     videoUrl: "", 
     videoLink: ""
   },
+  {
+    id: 64500,
+    title: "تأمالت للفتيات والفتيان",
+    category: "تعليم و تربية",
+    year: "2022",
+    pages: 0,
+    publisher: "منشورات لوتس للنرش احلر",
+    description: "",
+    coverImage: "/images/taamoulat",
+    pdfUrl: "",
+    videoUrl: "https://www.youtube.com/embed/3LlP87RHtOg",
+    videoLink: "https://www.youtube.com/watch?v=3LlP87RHtOg"
+  },
   // ... وباقي الكتب كما هي ...
 ];
