@@ -1,6 +1,6 @@
 export const BOOKS_DATA = [
   {
-    id: 7,
+    id: 2,
     title: "بنت البواب",
     category: "روايات",
     year: "2025",
@@ -62,3 +62,4 @@ export const BOOKS_DATA = [
   },
   // ... وباقي الكتب كما هي ...
 ];
+export default BOOKS_DATA;

@@ -511,3 +511,4 @@ export const ARTICLES_DATA = [
         content: "قراءة أدبية تسقط دلالات قصة غوغول على الواقع المعاش." 
     }
 ];
+export default ARTICLES_DATA;

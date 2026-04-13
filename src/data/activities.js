@@ -37,4 +37,6 @@ export const ACTIVITIES_DATA = [
     description: "مداخلة في ندوة جامعية حول واقع التعليم وسبل الإصلاح التربوي.",
     imageUrl: "https://placehold.co/800x600/e7e5e4/78716c?text=لقاء+جامعي"
   }
+  
 ];
+export default ACTIVITIES_DATA;
