@@ -291,7 +291,52 @@ const App = () => {
       case 'articles': return <ArticlesPage setPage={navigateTo} setArticle={setSelectedArticle} searchQuery={searchQuery} />;
       case 'article-detail': return selectedArticle ? <ArticleReader article={selectedArticle} setPage={navigateTo} /> : <ArticlesPage setPage={navigateTo} setArticle={setSelectedArticle} searchQuery={searchQuery} />;
       case 'activities': return <div className="pt-40 text-center text-2xl font-serif">قسم الأنشطة واللقاءات الثقافية قيد التحديث...</div>;
-      case 'about': return <div className="pt-40 text-center text-2xl font-serif max-w-2xl mx-auto px-4">بوسلهام عميمر، كاتب وناقد ومربي مغربي، كرس حياته لخدمة الكلمة الصادقة والتربية البناءة.</div>;
+case 'about': return (
+        <div className="pt-32 pb-20 max-w-4xl mx-auto px-4 animate-fade-in text-right font-sans">
+          <h2 className="text-4xl font-bold text-stone-900 font-serif text-center mb-12 underline decoration-amber-200 underline-offset-8">الأديب بوسلهام عميمر: سيرة ومسيرة</h2>
+          
+          <div className="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-stone-100 space-y-10 leading-loose text-stone-800 text-lg">
+            
+            {/* قسم التعريف العام */}
+            <div className="border-r-4 border-amber-700 pr-4">
+              <p className="font-serif text-xl text-stone-900 font-medium">
+                بوسلهام عميمر، كاتب ومربٍّ مغربي، كرس حياته لخدمة الفكر، الأدب، وقضايا التربية والتعليم. تميزت مسيرته بالعطاء المستمر والبحث الدؤوب عن الكلمة الصادقة والأثر البناء.
+              </p>
+            </div>
+
+            {/* المسار المهني والتربوي */}
+            <div>
+              <h3 className="text-2xl font-bold text-stone-900 font-serif mb-4 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-amber-700"></span> المسار المهني والتربوي
+              </h3>
+              <p>
+                اشتغل لسنوات طويلة في ميدان التربية والتكوين، حيث تخرجت على يديه أجيال من الطلبة والأساتذة. لم يكن التعليم بالنسبة إليه مجرد وظيفة، بل رسالة وجودية تجلت في كتاباته النقدية التي تشرح واقع المنظومة التعليمية وتقترح حلولاً عملية للنهوض بها.
+              </p>
+            </div>
+
+            {/* العالم الأدبي والإبداعي */}
+            <div>
+              <h3 className="text-2xl font-bold text-stone-900 font-serif mb-4 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-amber-700"></span> العالم الأدبي والإبداعي
+              </h3>
+              <p>
+                تتنوع كتاباته بين الرواية السردية، النقد الأدبي، والتدوينات الفكرية. يُعرف بأسلوبه الرصين الذي يجمع بين جمالية اللغة العربية الكلاسيكية وقوة التحليل الواقعي. أصدر عدة مؤلفات بارزة لقيت احتفاءً في الأوساط الثقافية المغربية والعربية، من بينها روايته الأخيرة "بنت البواب" وكتابه "صحرائي في عيوني".
+              </p>
+            </div>
+
+            {/* العضوية والنشاط الثقافي */}
+            <div>
+              <h3 className="text-2xl font-bold text-stone-900 font-serif mb-4 flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-amber-700"></span> النشاط الثقافي والمجتمعي
+              </h3>
+              <p>
+                حضور وازن في الملتقيات الثقافية، الندوات الفكرية، والمعارض الوطنية للكتاب. يُسهم بانتظام في إغناء النقاش العمومي حول قضايا الهوية والتعليم من خلال مقالاته الرصينة في كبريات الصحف والمجلات الرقمية والورقية (مثل منصة هسبريس)، مؤمناً بأن المثقف يجب أن يكون مرآة لمجتمعه.
+              </p>
+            </div>
+
+          </div>
+        </div>
+      );
       case 'contact': return <div className="pt-40 text-center font-mono text-xl">contact@malaath.ma</div>;
       default: return <HomePage setPage={navigateTo} />;
     }
