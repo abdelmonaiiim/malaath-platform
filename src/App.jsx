@@ -1,19 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Book, PenTool, Youtube, Mail, Menu, X, Heart, Globe, FileText, 
   ChevronLeft, Download, ExternalLink, ArrowRight, ChevronDown, 
   Mic, PlayCircle, Search, Share2, Calendar, User, Printer, 
-  Facebook, Twitter, Linkedin, ChevronRight, Video, Loader
+  Facebook, Twitter, Linkedin, ChevronRight, Video, Loader, Image as ImageIcon
 } from 'lucide-react';
 
-// ==========================================
-// 1. الاستيراد من ملفاتك المحلية و Sanity
-// ==========================================
 import { client, urlFor } from './client';
 import Logo from './components/Logo';
 
 // ==========================================
-// 2. مكونات الواجهة (Header & Footer)
+// مكونات الواجهة (Header & Footer)
 // ==========================================
 
 const Header = ({ activePage, setPage, searchQuery, setSearchQuery }) => {
@@ -30,9 +27,7 @@ const Header = ({ activePage, setPage, searchQuery, setSearchQuery }) => {
     { id: 'home', label: 'الرئيسية' },
     { id: 'books', label: 'المؤلفات' },
     { id: 'articles', label: 'المقالات' },
-    { id: 'activities', label: 'أنشطة ولقاءات' },
     { id: 'about', label: 'السيرة الذاتية' },
-    { id: 'contact', label: 'تواصل' },
   ];
 
   const handleNavClick = (id) => {
@@ -141,45 +136,115 @@ const Footer = ({ setPage }) => (
 );
 
 // ==========================================
-// 3. منطق الصفحات الداخلي (محدث لاستقبال البيانات)
+// الصفحة الرئيسية (محدثة بالـ Carousel)
 // ==========================================
 
-const HomePage = ({ setPage, setBook, books }) => {
+const HomePage = ({ setPage, setBook, books, events }) => {
   const latestBook = books && books.length > 0 ? books[0] : null;
+  const scrollContainerRef = useRef(null);
+
+  const scroll = (direction) => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 300;
+      scrollContainerRef.current.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="animate-fade-in pt-32 pb-20 max-w-7xl mx-auto px-4 text-right">
-      <div className="grid lg:grid-cols-2 gap-12 items-center">
+      
+      {/* القسم الأول: الترحيب وأحدث إصدار */}
+      <div className="grid lg:grid-cols-2 gap-12 items-center mb-24">
         <div>
           <h1 className="text-4xl lg:text-6xl font-bold text-stone-900 font-serif mb-6 leading-tight">حينما يُصبح القلم <span className="text-amber-800">وطناً وذاكرة</span></h1>
-          <p className="text-lg text-stone-600 mb-8 max-w-xl">الموقع الرسمي للأديب والناقد بوسلهام عميمر. نافذة تطل على عالم من السرد والنقد التربوي.</p>
+          <p className="text-lg text-stone-600 mb-8 max-w-xl">الموقع الرسمي للأديب والناقد بوسلهام عميمر. نافذة تطل على عالم من السرد والنقد التربوي والتوثيق.</p>
           <div className="flex gap-4">
             <button onClick={() => setPage('books')} className="px-8 py-4 bg-stone-900 text-white rounded-xl shadow-lg flex items-center gap-2 transition-transform hover:scale-105"><Book size={20} /> تصفح المكتبة</button>
             <button onClick={() => setPage('articles')} className="px-8 py-4 bg-white text-stone-900 border border-stone-200 rounded-xl transition-colors hover:bg-stone-50">أحدث المقالات</button>
           </div>
         </div>
+        
+        {/* أحدث إصدار */}
         {latestBook && (
-          <div className="hidden lg:block bg-white p-8 rounded-3xl shadow-xl border border-stone-100 relative">
+          <div className="hidden lg:block bg-white p-8 rounded-3xl shadow-xl border border-stone-100 relative overflow-hidden group">
+             <div className="absolute top-0 right-0 w-32 h-32 bg-amber-100 rounded-bl-full -z-10 opacity-50 group-hover:scale-110 transition-transform"></div>
              <div className="flex gap-6">
-                {latestBook.coverImage ? <img src={urlFor(latestBook.coverImage).url()} className="w-32 h-48 rounded shadow-md object-cover" alt={latestBook.title} /> : <div className="w-32 h-48 bg-stone-800 rounded shadow-md flex items-center justify-center text-white text-center text-xs p-2">{latestBook.title}</div>}
-                <div>
-                   <span className="text-xs font-bold text-amber-600">أحدث الإصدارات</span>
-                   <h3 className="text-2xl font-bold text-stone-900 font-serif mb-2">{latestBook.title}</h3>
-                   <button onClick={() => { setBook(latestBook); setPage('book-detail'); }} className="text-sm font-bold text-stone-900 border-b-2 border-stone-900 hover:text-amber-700 hover:border-amber-700 transition-colors">اقرأ المزيد</button>
+                {latestBook.coverImage ? (
+                  <img src={urlFor(latestBook.coverImage).url()} className="w-36 h-52 rounded-lg shadow-md object-cover" alt={latestBook.title} />
+                ) : (
+                  <div className="w-36 h-52 bg-stone-800 rounded-lg shadow-md flex items-center justify-center text-white text-center p-4">{latestBook.title}</div>
+                )}
+                <div className="flex flex-col justify-center">
+                   <div className="flex items-center gap-2 mb-3">
+                     <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                     <span className="text-sm font-bold text-amber-700 tracking-wider">أحدث الإصدارات</span>
+                   </div>
+                   <h3 className="text-3xl font-bold text-stone-900 font-serif mb-4 leading-snug">{latestBook.title}</h3>
+                   <button onClick={() => { setBook(latestBook); setPage('book-detail'); }} className="flex items-center gap-2 text-stone-900 font-bold hover:text-amber-700 transition-colors self-start border-b-2 border-stone-900 hover:border-amber-700 pb-1">
+                     اقرأ المزيد <ChevronLeft size={16} />
+                   </button>
                 </div>
              </div>
           </div>
         )}
       </div>
+
+      {/* القسم الثاني: معرض الأنشطة واللقاءات (Carousel) */}
+      {events && events.length > 0 && (
+        <div className="relative pt-12 border-t border-stone-200">
+          <div className="flex justify-between items-end mb-8">
+            <div>
+              <h2 className="text-3xl font-bold text-stone-900 font-serif mb-2">أحدث اللقاءات والأنشطة</h2>
+              <p className="text-stone-500">متابعة للإسهامات الثقافية والحضور الإعلامي</p>
+            </div>
+            {/* أزرار التحكم في الـ Carousel */}
+            <div className="hidden md:flex gap-2">
+              <button onClick={() => scroll('right')} className="w-10 h-10 rounded-full border border-stone-300 flex items-center justify-center text-stone-600 hover:bg-stone-900 hover:text-white transition-colors"><ChevronRight size={20}/></button>
+              <button onClick={() => scroll('left')} className="w-10 h-10 rounded-full border border-stone-300 flex items-center justify-center text-stone-600 hover:bg-stone-900 hover:text-white transition-colors"><ChevronLeft size={20}/></button>
+            </div>
+          </div>
+
+          {/* حاوية الصور القابلة للسحب */}
+          <div 
+            ref={scrollContainerRef}
+            className="flex gap-6 overflow-x-auto snap-x snap-mandatory hide-scrollbar pb-8"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {events.map((event) => (
+              <div key={event._id} className="min-w-[300px] md:min-w-[400px] snap-start bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden group">
+                <div className="relative h-60 bg-stone-100 overflow-hidden">
+                  {event.coverImage ? (
+                    <img src={urlFor(event.coverImage).url()} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" alt={event.title} />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-stone-400"><ImageIcon size={40}/></div>
+                  )}
+                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur text-stone-800 text-xs font-bold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1">
+                    <Calendar size={12}/> {event.date || 'حديث'}
+                  </div>
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-stone-900 font-serif mb-2">{event.title}</h3>
+                  <p className="text-stone-600 text-sm leading-relaxed line-clamp-2">{event.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
+
+// ==========================================
+// باقي الصفحات (المكتبة والمقالات)
+// ==========================================
 
 const BooksPage = ({ setPage, setBook, books }) => (
   <div className="pt-32 pb-20 max-w-7xl mx-auto px-4 text-right">
     <h2 className="text-4xl font-bold text-stone-900 font-serif text-center mb-16 underline decoration-amber-200 underline-offset-8">المكتبة الرقمية</h2>
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
       {(books || []).map((book) => (
-        <div key={book._id || book.id} className="group bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden flex flex-col hover:shadow-xl transition-all">
+        <div key={book._id} className="group bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden flex flex-col hover:shadow-xl transition-all">
           <div className="h-64 bg-stone-100 flex items-center justify-center p-8 relative">
             {book.coverImage ? <img src={urlFor(book.coverImage).url()} className="w-40 h-56 shadow-2xl object-cover relative z-10" alt={book.title} /> : <div className="w-40 h-56 bg-stone-800 flex items-center justify-center text-white text-center p-4">{book.title}</div>}
           </div>
@@ -204,7 +269,7 @@ const BookDetailView = ({ book, setPage }) => (
       <div className="lg:col-span-8">
         <span className="bg-amber-100 text-amber-800 text-xs font-bold px-4 py-1.5 rounded-full mb-4 inline-block">{book.category}</span>
         <h1 className="text-4xl lg:text-5xl font-bold text-stone-900 font-serif mb-6 leading-tight">{book.title}</h1>
-        <p className="text-stone-700 mb-10 leading-relaxed whitespace-pre-line text-lg">{book.description || "لا يوجد وصف متوفر حالياً لهذا الكتاب."}</p>
+        <p className="text-stone-700 mb-10 leading-relaxed whitespace-pre-line text-lg">{book.description || "لا يوجد وصف متوفر حالياً."}</p>
         <div className="flex flex-col gap-8">
           {book.pdfUrl && <a href={book.pdfUrl} target="_blank" rel="noreferrer" className="w-full md:w-1/2 bg-amber-700 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg hover:bg-amber-800 transition-colors"><Download size={20} /> تحميل نسخة PDF</a>}
           {book.videoUrl && (
@@ -228,7 +293,7 @@ const ArticlesPage = ({ setPage, setArticle, searchQuery, articles }) => {
       <h2 className="text-4xl font-bold text-stone-900 font-serif text-center mb-12 underline decoration-amber-200 underline-offset-8">أرشيف المقالات</h2>
       <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-8">
         {filtered.map(article => (
-          <div key={article._id || article.id} onClick={() => { setArticle(article); setPage('article-detail'); }} className="bg-white border border-stone-200 rounded-xl p-6 cursor-pointer hover:border-amber-300 transition-all flex flex-col h-full hover:shadow-md group">
+          <div key={article._id} onClick={() => { setArticle(article); setPage('article-detail'); }} className="bg-white border border-stone-200 rounded-xl p-6 cursor-pointer hover:border-amber-300 transition-all flex flex-col h-full hover:shadow-md group">
             <span className="text-[10px] font-bold px-2 py-1 rounded bg-stone-50 text-stone-600 mb-4 self-start">{article.category}</span>
             <h3 className="text-xl font-bold text-stone-900 font-serif mb-4 flex-grow leading-snug group-hover:text-amber-800">{article.title}</h3>
             <div className="pt-4 border-t border-stone-50 flex justify-between text-xs text-stone-400 font-mono">
@@ -242,7 +307,6 @@ const ArticlesPage = ({ setPage, setArticle, searchQuery, articles }) => {
   );
 };
 
-// دالة مساعدة بسيطة لتحويل نصوص Sanity إلى نص عادي للقراءة
 const renderSanityText = (blocks) => {
   if (typeof blocks === 'string') return blocks;
   if (!Array.isArray(blocks)) return "المحتوى الكامل غير متوفر حالياً.";
@@ -266,7 +330,7 @@ const ArticleReader = ({ article, setPage }) => (
 );
 
 // ==========================================
-// 4. المكون الرئيسي (App Logic) وجلب البيانات
+// المكون الرئيسي والمنطق
 // ==========================================
 
 const App = () => {
@@ -275,24 +339,21 @@ const App = () => {
   const [selectedBook, setSelectedBook] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   
-  // حالات البيانات الحية
   const [books, setBooks] = useState([]);
   const [articles, setArticles] = useState([]);
+  const [events, setEvents] = useState([]); // أضفنا حالة الأنشطة
   const [isLoading, setIsLoading] = useState(true);
 
-  // جلب البيانات من Sanity
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // نستجلب الكتب مع رابط مباشر لملف الـ PDF إن وجد
-        const booksData = await client.fetch(`*[_type == "book"] | order(year desc) {
-          ...,
-          "pdfUrl": pdfFile.asset->url
-        }`);
+        const booksData = await client.fetch(`*[_type == "book"] | order(year desc) {..., "pdfUrl": pdfFile.asset->url}`);
         const articlesData = await client.fetch('*[_type == "article"] | order(date desc)');
+        const eventsData = await client.fetch('*[_type == "event"] | order(date desc)'); // استدعاء الأنشطة
         
         setBooks(booksData);
         setArticles(articlesData);
+        setEvents(eventsData);
         setIsLoading(false);
       } catch (error) {
         console.error("خطأ في جلب البيانات:", error);
@@ -303,7 +364,6 @@ const App = () => {
     fetchData();
   }, []);
 
-  // التحكم بالروابط
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '') || 'home';
@@ -317,7 +377,6 @@ const App = () => {
 
   const navigateTo = (newPage) => { window.location.hash = newPage; };
 
-  // شاشة التحميل
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#fdfbf7]">
@@ -331,61 +390,49 @@ const App = () => {
 
   const renderContent = () => {
     switch (page) {
-      case 'home': return <HomePage setPage={navigateTo} setBook={setSelectedBook} books={books} />;
+      case 'home': return <HomePage setPage={navigateTo} setBook={setSelectedBook} books={books} events={events} />;
       case 'books': return <BooksPage setPage={navigateTo} setBook={setSelectedBook} books={books} />;
       case 'book-detail': return selectedBook ? <BookDetailView book={selectedBook} setPage={navigateTo} /> : <BooksPage setPage={navigateTo} setBook={setSelectedBook} books={books} />;
       case 'articles': return <ArticlesPage setPage={navigateTo} setArticle={setSelectedArticle} searchQuery={searchQuery} articles={articles} />;
       case 'article-detail': return selectedArticle ? <ArticleReader article={selectedArticle} setPage={navigateTo} /> : <ArticlesPage setPage={navigateTo} setArticle={setSelectedArticle} searchQuery={searchQuery} articles={articles} />;
-      case 'activities': return <div className="pt-40 text-center text-2xl font-serif">قسم الأنشطة واللقاءات الثقافية قيد التحديث...</div>;
       case 'about': return (
         <div className="pt-32 pb-20 max-w-4xl mx-auto px-4 animate-fade-in text-right font-sans">
-          <h2 className="text-4xl font-bold text-stone-900 font-serif text-center mb-12 underline decoration-amber-200 underline-offset-8">الأديب بوسلهام عميمر: سيرة ومسيرة</h2>
-          
-          <div className="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-stone-100 space-y-10 leading-loose text-stone-800 text-lg">
-            
-            <div className="border-r-4 border-amber-700 pr-4">
-              <p className="font-serif text-xl text-stone-900 font-medium">
-                بوسلهام عميمر، كاتب ومربٍّ مغربي، كرس حياته لخدمة الفكر، الأدب، وقضايا التربية والتعليم. تميزت مسيرته بالعطاء المستمر والبحث الدؤوب عن الكلمة الصادقة والأثر البناء.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-2xl font-bold text-stone-900 font-serif mb-4 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-amber-700"></span> المسار المهني والتربوي
-              </h3>
-              <p>
-                اشتغل لسنوات طويلة في ميدان التربية والتكوين، حيث تخرجت على يديه أجيال من الطلبة والأساتذة. لم يكن التعليم بالنسبة إليه مجرد وظيفة، بل رسالة وجودية تجلت في كتاباته النقدية التي تشرح واقع المنظومة التعليمية وتقترح حلولاً عملية للنهوض بها.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-2xl font-bold text-stone-900 font-serif mb-4 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-amber-700"></span> العالم الأدبي والإبداعي
-              </h3>
-              <p>
-                تتنوع كتاباته بين الرواية السردية، النقد الأدبي، والتدوينات الفكرية. يُعرف بأسلوبه الرصين الذي يجمع بين جمالية اللغة العربية الكلاسيكية وقوة التحليل الواقعي. أصدر عدة مؤلفات بارزة لقيت احتفاءً في الأوساط الثقافية المغربية والعربية، من بينها روايته الأخيرة "بنت البواب" وكتابه "صحرائي في عيوني".
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-2xl font-bold text-stone-900 font-serif mb-4 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-amber-700"></span> النشاط الثقافي والمجتمعي
-              </h3>
-              <p>
-                حضور وازن في الملتقيات الثقافية، الندوات الفكرية، والمعارض الوطنية للكتاب. يُسهم بانتظام في إغناء النقاش العمومي حول قضايا الهوية والتعليم من خلال مقالاته الرصينة في كبريات الصحف والمجلات الرقمية والورقية (مثل منصة هسبريس)، مؤمناً بأن المثقف يجب أن يكون مرآة لمجتمعه.
-              </p>
-            </div>
-
+          <div className="text-center mb-16">
+            <h2 className="text-4xl lg:text-5xl font-bold text-stone-900 font-serif mb-4">السيرة والمسار</h2>
+            <p className="text-xl text-stone-500 font-serif">خريطة طريق الأديب والمربي بوسلهام عميمر</p>
+          </div>
+          <div className="flex flex-col">
+            {[
+              { title: "الرؤية والرسالة", icon: <PenTool size={20} className="text-white" />, content: "بوسلهام عميمر، صوت مغربي أصيل، جمع بين دقة المربي، ورؤية الناقد، وحساسية الأديب. كرس حياته المهنية والإبداعية للدفاع عن قيم المدرسة العمومية، وتفكيك قضايا المجتمع، وتوثيق الذاكرة الوطنية." },
+              { title: "المسار المهني والتربوي", icon: <Book size={20} className="text-white" />, content: "اشتغل لسنوات طويلة في ميدان التربية والتكوين، حيث تخرجت على يديه أجيال من الطلبة والأساتذة. لم يكن التعليم بالنسبة إليه مجرد وظيفة، بل رسالة وجودية تجلت في كتاباته النقدية التي تشرح واقع المنظومة التعليمية وتقترح حلولاً عملية للنهوض بها." },
+              { title: "العالم الأدبي والإبداعي", icon: <FileText size={20} className="text-white" />, content: "تتنوع كتاباته بين الرواية السردية، النقد الأدبي، والتدوينات الفكرية. يُعرف بأسلوبه الرصين الذي يجمع بين جمالية اللغة العربية الكلاسيكية وقوة التحليل الواقعي. أصدر عدة مؤلفات بارزة لقيت احتفاءً في الأوساط الثقافية المغربية والعربية، من بينها روايته الأخيرة «بنت البواب» وكتابه «صحرائي في عيوني»." },
+              { title: "الحضور الثقافي والإعلامي", icon: <Mic size={20} className="text-white" />, content: "حضور وازن في الملتقيات الثقافية، الندوات الفكرية، والمعارض الوطنية للكتاب. يُسهم بانتظام في إغناء النقاش العمومي حول قضايا الهوية والتعليم من خلال مقالاته الرصينة في كبريات الصحف والمجلات الرقمية والورقية." }
+            ].map((item, index, arr) => (
+              <div key={index} className="flex gap-6 relative">
+                <div className="flex flex-col items-center">
+                  <div className="w-14 h-14 bg-amber-700 rounded-full flex items-center justify-center border-4 border-[#fdfbf7] shadow-md z-10 shrink-0">{item.icon}</div>
+                  {index !== arr.length - 1 && <div className="w-1.5 bg-amber-200/60 h-full -mt-2"></div>}
+                </div>
+                <div className="pb-16 pt-2 w-full">
+                  <h3 className="text-2xl font-bold text-stone-900 font-serif mb-4">{item.title}</h3>
+                  <div className="bg-white p-8 rounded-3xl shadow-sm border border-stone-100 hover:shadow-lg transition-shadow duration-300">
+                    <p className="text-stone-700 leading-relaxed text-lg">{item.content}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       );
-      case 'contact': return <div className="pt-40 text-center font-mono text-xl">contact@malaath.ma</div>;
-      default: return <HomePage setPage={navigateTo} books={books} />;
+      default: return <HomePage setPage={navigateTo} books={books} events={events} />;
     }
   };
 
   return (
     <div dir="rtl" className="font-sans text-stone-800 bg-[#fdfbf7] min-h-screen selection:bg-amber-200">
+      <style dangerouslySetInnerHTML={{__html: `
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+      `}} />
       <Header activePage={page} setPage={navigateTo} searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
       <main className="min-h-screen">
         {renderContent()}
