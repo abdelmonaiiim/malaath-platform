@@ -5,7 +5,9 @@ export default {
   fields: [
     { name: 'title', title: 'عنوان النشاط أو اللقاء', type: 'string' },
     { name: 'date', title: 'تاريخ النشاط', type: 'date' },
-    { name: 'description', title: 'وصف مختصر', type: 'text' },
-    { name: 'coverImage', title: 'صورة النشاط الرئيسية', type: 'image', options: { hotspot: true } },
+    { name: 'time', title: 'التوقيت (مثل: 16:00 مساءً)', type: 'string' },
+    { name: 'location', title: 'مكان اللقاء (مثل: المكتبة الوطنية، الرباط)', type: 'string' },
+    { name: 'description', title: 'وصف مختصر أو محاور اللقاء', type: 'text' },
+    { name: 'coverImage', title: 'صورة النشاط (أو ملصق الإعلان)', type: 'image', options: { hotspot: true } },
   ]
 }

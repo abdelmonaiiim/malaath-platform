@@ -3,7 +3,7 @@ import {
   Book, PenTool, Youtube, Mail, Menu, X, Heart, Globe, FileText, 
   ChevronLeft, Download, ExternalLink, ArrowRight, ChevronDown, 
   Mic, PlayCircle, Search, Share2, Calendar, User, Printer, 
-  Facebook, Twitter, Linkedin, ChevronRight, Video, Loader, Image as ImageIcon
+  Facebook, Twitter, Linkedin, ChevronRight, Video, Loader, Image as ImageIcon, MapPin, Clock
 } from 'lucide-react';
 
 import { client, urlFor } from './client';
@@ -136,12 +136,18 @@ const Footer = ({ setPage }) => (
 );
 
 // ==========================================
-// الصفحة الرئيسية (محدثة بالـ Carousel)
+// الصفحة الرئيسية (محدثة بصندوق الحدث المرتقب)
 // ==========================================
 
 const HomePage = ({ setPage, setBook, books, events }) => {
   const latestBook = books && books.length > 0 ? books[0] : null;
   const scrollContainerRef = useRef(null);
+
+  // المنطق الذكي لفصل الأنشطة القادمة عن السابقة
+  const today = new Date().toISOString().split('T')[0];
+  const upcomingEvents = (events || []).filter(e => e.date && e.date >= today).sort((a, b) => new Date(a.date) - new Date(b.date));
+  const pastEvents = (events || []).filter(e => !e.date || e.date < today);
+  const nextEvent = upcomingEvents.length > 0 ? upcomingEvents[0] : null;
 
   const scroll = (direction) => {
     if (scrollContainerRef.current) {
@@ -153,7 +159,6 @@ const HomePage = ({ setPage, setBook, books, events }) => {
   return (
     <div className="animate-fade-in pt-32 pb-20 max-w-7xl mx-auto px-4 text-right">
       
-      {/* القسم الأول: الترحيب وأحدث إصدار */}
       <div className="grid lg:grid-cols-2 gap-12 items-center mb-24">
         <div>
           <h1 className="text-4xl lg:text-6xl font-bold text-stone-900 font-serif mb-6 leading-tight">حينما يُصبح القلم <span className="text-amber-800">وطناً وذاكرة</span></h1>
@@ -164,7 +169,6 @@ const HomePage = ({ setPage, setBook, books, events }) => {
           </div>
         </div>
         
-        {/* أحدث إصدار */}
         {latestBook && (
           <div className="hidden lg:block bg-white p-8 rounded-3xl shadow-xl border border-stone-100 relative overflow-hidden group">
              <div className="absolute top-0 right-0 w-32 h-32 bg-amber-100 rounded-bl-full -z-10 opacity-50 group-hover:scale-110 transition-transform"></div>
@@ -189,28 +193,56 @@ const HomePage = ({ setPage, setBook, books, events }) => {
         )}
       </div>
 
-      {/* القسم الثاني: معرض الأنشطة واللقاءات (Carousel) */}
-      {events && events.length > 0 && (
+      {/* ============== صندوق الحدث المرتقب ============== */}
+      {nextEvent && (
+        <div className="mb-24 bg-gradient-to-r from-stone-900 to-stone-800 rounded-3xl p-8 md:p-12 text-white shadow-2xl relative overflow-hidden flex flex-col md:flex-row gap-8 items-center border border-stone-700">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-amber-600 rounded-full blur-3xl opacity-20 -z-10"></div>
+          
+          {nextEvent.coverImage ? (
+            <img src={urlFor(nextEvent.coverImage).url()} className="w-full md:w-1/3 rounded-xl shadow-lg object-cover aspect-[4/3] z-10 border border-stone-600" alt={nextEvent.title} />
+          ) : (
+             <div className="w-full md:w-1/3 aspect-[4/3] bg-stone-800 rounded-xl flex items-center justify-center border border-stone-600"><Calendar size={40} className="text-stone-500"/></div>
+          )}
+
+          <div className="flex-1 z-10 w-full">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="bg-amber-600 text-white text-xs font-bold px-4 py-1.5 rounded-full animate-pulse flex items-center gap-2">
+                <Mic size={14}/> حدث مرتقب
+              </span>
+            </div>
+            <h3 className="text-3xl md:text-4xl font-bold font-serif mb-4 leading-tight">{nextEvent.title}</h3>
+            <p className="text-stone-300 text-lg mb-8 leading-relaxed line-clamp-3">{nextEvent.description}</p>
+            
+            <div className="flex flex-wrap gap-6 text-sm font-medium text-amber-200 bg-white/5 p-4 rounded-2xl border border-white/10">
+              {nextEvent.date && <div className="flex items-center gap-2"><Calendar size={18}/> {nextEvent.date}</div>}
+              {nextEvent.time && <div className="flex items-center gap-2"><Clock size={18}/> {nextEvent.time}</div>}
+              {nextEvent.location && <div className="flex items-center gap-2"><MapPin size={18}/> {nextEvent.location}</div>}
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ================================================= */}
+
+      {/* معرض الأنشطة واللقاءات السابقة (أرشيف) */}
+      {pastEvents && pastEvents.length > 0 && (
         <div className="relative pt-12 border-t border-stone-200">
           <div className="flex justify-between items-end mb-8">
             <div>
-              <h2 className="text-3xl font-bold text-stone-900 font-serif mb-2">أحدث اللقاءات والأنشطة</h2>
+              <h2 className="text-3xl font-bold text-stone-900 font-serif mb-2">أرشيف اللقاءات والأنشطة</h2>
               <p className="text-stone-500">متابعة للإسهامات الثقافية والحضور الإعلامي</p>
             </div>
-            {/* أزرار التحكم في الـ Carousel */}
             <div className="hidden md:flex gap-2">
               <button onClick={() => scroll('right')} className="w-10 h-10 rounded-full border border-stone-300 flex items-center justify-center text-stone-600 hover:bg-stone-900 hover:text-white transition-colors"><ChevronRight size={20}/></button>
               <button onClick={() => scroll('left')} className="w-10 h-10 rounded-full border border-stone-300 flex items-center justify-center text-stone-600 hover:bg-stone-900 hover:text-white transition-colors"><ChevronLeft size={20}/></button>
             </div>
           </div>
 
-          {/* حاوية الصور القابلة للسحب */}
           <div 
             ref={scrollContainerRef}
             className="flex gap-6 overflow-x-auto snap-x snap-mandatory hide-scrollbar pb-8"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
-            {events.map((event) => (
+            {pastEvents.map((event) => (
               <div key={event._id} className="min-w-[300px] md:min-w-[400px] snap-start bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden group">
                 <div className="relative h-60 bg-stone-100 overflow-hidden">
                   {event.coverImage ? (
@@ -219,7 +251,7 @@ const HomePage = ({ setPage, setBook, books, events }) => {
                     <div className="w-full h-full flex items-center justify-center text-stone-400"><ImageIcon size={40}/></div>
                   )}
                   <div className="absolute top-4 right-4 bg-white/90 backdrop-blur text-stone-800 text-xs font-bold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1">
-                    <Calendar size={12}/> {event.date || 'حديث'}
+                    <Calendar size={12}/> {event.date || 'أرشيف'}
                   </div>
                 </div>
                 <div className="p-6">
@@ -236,7 +268,7 @@ const HomePage = ({ setPage, setBook, books, events }) => {
 };
 
 // ==========================================
-// باقي الصفحات (المكتبة والمقالات)
+// باقي الصفحات
 // ==========================================
 
 const BooksPage = ({ setPage, setBook, books }) => (
@@ -341,7 +373,7 @@ const App = () => {
   
   const [books, setBooks] = useState([]);
   const [articles, setArticles] = useState([]);
-  const [events, setEvents] = useState([]); // أضفنا حالة الأنشطة
+  const [events, setEvents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -349,7 +381,7 @@ const App = () => {
       try {
         const booksData = await client.fetch(`*[_type == "book"] | order(year desc) {..., "pdfUrl": pdfFile.asset->url}`);
         const articlesData = await client.fetch('*[_type == "article"] | order(date desc)');
-        const eventsData = await client.fetch('*[_type == "event"] | order(date desc)'); // استدعاء الأنشطة
+        const eventsData = await client.fetch('*[_type == "event"] | order(date desc)');
         
         setBooks(booksData);
         setArticles(articlesData);
