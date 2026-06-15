@@ -3,15 +3,13 @@ import {
   Book, PenTool, Youtube, Mail, Menu, X, Heart, Globe, FileText, 
   ChevronLeft, Download, ExternalLink, ArrowRight, ChevronDown, 
   Mic, PlayCircle, Search, Share2, Calendar, User, Printer, 
-  Facebook, Twitter, Linkedin, ChevronRight, Video
+  Facebook, Twitter, Linkedin, ChevronRight, Video, Loader
 } from 'lucide-react';
 
 // ==========================================
-// 1. الاستيراد من ملفاتك المحلية
+// 1. الاستيراد من ملفاتك المحلية و Sanity
 // ==========================================
-import BOOKS_DATA from './data/books';
-import ARTICLES_DATA from './data/articles';
-import ACTIVITIES_DATA from './data/activities';
+import { client, urlFor } from './client';
 import Logo from './components/Logo';
 
 // ==========================================
@@ -143,11 +141,11 @@ const Footer = ({ setPage }) => (
 );
 
 // ==========================================
-// 3. منطق الصفحات الداخلي
+// 3. منطق الصفحات الداخلي (محدث لاستقبال البيانات)
 // ==========================================
 
-const HomePage = ({ setPage, setBook }) => {
-  const latestBook = BOOKS_DATA && BOOKS_DATA.length > 0 ? BOOKS_DATA[0] : null;
+const HomePage = ({ setPage, setBook, books }) => {
+  const latestBook = books && books.length > 0 ? books[0] : null;
   return (
     <div className="animate-fade-in pt-32 pb-20 max-w-7xl mx-auto px-4 text-right">
       <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -162,7 +160,7 @@ const HomePage = ({ setPage, setBook }) => {
         {latestBook && (
           <div className="hidden lg:block bg-white p-8 rounded-3xl shadow-xl border border-stone-100 relative">
              <div className="flex gap-6">
-                {latestBook.coverImage ? <img src={latestBook.coverImage} className="w-32 h-48 rounded shadow-md object-cover" alt="" /> : <div className="w-32 h-48 bg-stone-800 rounded shadow-md flex items-center justify-center text-white text-center text-xs p-2">{latestBook.title}</div>}
+                {latestBook.coverImage ? <img src={urlFor(latestBook.coverImage).url()} className="w-32 h-48 rounded shadow-md object-cover" alt={latestBook.title} /> : <div className="w-32 h-48 bg-stone-800 rounded shadow-md flex items-center justify-center text-white text-center text-xs p-2">{latestBook.title}</div>}
                 <div>
                    <span className="text-xs font-bold text-amber-600">أحدث الإصدارات</span>
                    <h3 className="text-2xl font-bold text-stone-900 font-serif mb-2">{latestBook.title}</h3>
@@ -176,14 +174,14 @@ const HomePage = ({ setPage, setBook }) => {
   );
 };
 
-const BooksPage = ({ setPage, setBook }) => (
+const BooksPage = ({ setPage, setBook, books }) => (
   <div className="pt-32 pb-20 max-w-7xl mx-auto px-4 text-right">
     <h2 className="text-4xl font-bold text-stone-900 font-serif text-center mb-16 underline decoration-amber-200 underline-offset-8">المكتبة الرقمية</h2>
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-      {(BOOKS_DATA || []).map((book) => (
-        <div key={book.id} className="group bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden flex flex-col hover:shadow-xl transition-all">
+      {(books || []).map((book) => (
+        <div key={book._id || book.id} className="group bg-white rounded-2xl border border-stone-100 shadow-sm overflow-hidden flex flex-col hover:shadow-xl transition-all">
           <div className="h-64 bg-stone-100 flex items-center justify-center p-8 relative">
-            {book.coverImage ? <img src={book.coverImage} className="w-40 h-56 shadow-2xl object-cover relative z-10" alt="" /> : <div className="w-40 h-56 bg-stone-800 flex items-center justify-center text-white text-center p-4">{book.title}</div>}
+            {book.coverImage ? <img src={urlFor(book.coverImage).url()} className="w-40 h-56 shadow-2xl object-cover relative z-10" alt={book.title} /> : <div className="w-40 h-56 bg-stone-800 flex items-center justify-center text-white text-center p-4">{book.title}</div>}
           </div>
           <div className="p-6 flex-grow flex flex-col">
             <span className="text-xs font-bold text-amber-700 bg-amber-50 px-2 py-1 rounded self-start mb-2">{book.category}</span>
@@ -201,7 +199,7 @@ const BookDetailView = ({ book, setPage }) => (
     <button onClick={() => setPage('books')} className="flex items-center gap-2 text-stone-500 mb-8 hover:text-stone-900 transition-colors"><ChevronRight size={20} /> العودة للمكتبة</button>
     <div className="grid lg:grid-cols-12 gap-12 bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-stone-100">
       <div className="lg:col-span-4 flex justify-center">
-        {book.coverImage ? <img src={book.coverImage} className="w-full max-w-xs rounded-lg shadow-2xl" alt={book.title} /> : <div className="w-full aspect-[2/3] bg-stone-800 rounded-lg shadow-2xl"></div>}
+        {book.coverImage ? <img src={urlFor(book.coverImage).url()} className="w-full max-w-xs rounded-lg shadow-2xl" alt={book.title} /> : <div className="w-full aspect-[2/3] bg-stone-800 rounded-lg shadow-2xl"></div>}
       </div>
       <div className="lg:col-span-8">
         <span className="bg-amber-100 text-amber-800 text-xs font-bold px-4 py-1.5 rounded-full mb-4 inline-block">{book.category}</span>
@@ -223,14 +221,14 @@ const BookDetailView = ({ book, setPage }) => (
   </div>
 );
 
-const ArticlesPage = ({ setPage, setArticle, searchQuery }) => {
-  const filtered = (ARTICLES_DATA || []).filter(a => a.title.toLowerCase().includes(searchQuery.toLowerCase()));
+const ArticlesPage = ({ setPage, setArticle, searchQuery, articles }) => {
+  const filtered = (articles || []).filter(a => a.title?.toLowerCase().includes(searchQuery.toLowerCase()));
   return (
     <div className="pt-32 pb-20 max-w-7xl mx-auto px-4 text-right">
       <h2 className="text-4xl font-bold text-stone-900 font-serif text-center mb-12 underline decoration-amber-200 underline-offset-8">أرشيف المقالات</h2>
       <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-8">
         {filtered.map(article => (
-          <div key={article.id} onClick={() => { setArticle(article); setPage('article-detail'); }} className="bg-white border border-stone-200 rounded-xl p-6 cursor-pointer hover:border-amber-300 transition-all flex flex-col h-full hover:shadow-md group">
+          <div key={article._id || article.id} onClick={() => { setArticle(article); setPage('article-detail'); }} className="bg-white border border-stone-200 rounded-xl p-6 cursor-pointer hover:border-amber-300 transition-all flex flex-col h-full hover:shadow-md group">
             <span className="text-[10px] font-bold px-2 py-1 rounded bg-stone-50 text-stone-600 mb-4 self-start">{article.category}</span>
             <h3 className="text-xl font-bold text-stone-900 font-serif mb-4 flex-grow leading-snug group-hover:text-amber-800">{article.title}</h3>
             <div className="pt-4 border-t border-stone-50 flex justify-between text-xs text-stone-400 font-mono">
@@ -244,6 +242,13 @@ const ArticlesPage = ({ setPage, setArticle, searchQuery }) => {
   );
 };
 
+// دالة مساعدة بسيطة لتحويل نصوص Sanity إلى نص عادي للقراءة
+const renderSanityText = (blocks) => {
+  if (typeof blocks === 'string') return blocks;
+  if (!Array.isArray(blocks)) return "المحتوى الكامل غير متوفر حالياً.";
+  return blocks.map(block => block.children ? block.children.map(child => child.text).join('') : '').join('\n\n');
+};
+
 const ArticleReader = ({ article, setPage }) => (
   <div className="pt-32 pb-20 max-w-3xl mx-auto px-4 animate-fade-in text-right">
     <button onClick={() => setPage('articles')} className="flex items-center gap-2 text-stone-500 mb-8 hover:text-stone-900 transition-colors"><ChevronRight size={20} /> العودة للأرشيف</button>
@@ -255,13 +260,13 @@ const ArticleReader = ({ article, setPage }) => (
       </div>
     </header>
     <article className="bg-white p-8 md:p-12 rounded-2xl shadow-sm border border-stone-100 text-lg leading-loose whitespace-pre-line font-serif text-stone-800">
-      {article.content || "المحتوى الكامل غير متوفر حالياً."}
+      {renderSanityText(article.content)}
     </article>
   </div>
 );
 
 // ==========================================
-// 4. المكون الرئيسي (App Logic)
+// 4. المكون الرئيسي (App Logic) وجلب البيانات
 // ==========================================
 
 const App = () => {
@@ -269,7 +274,36 @@ const App = () => {
   const [selectedArticle, setSelectedArticle] = useState(null);
   const [selectedBook, setSelectedBook] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // حالات البيانات الحية
+  const [books, setBooks] = useState([]);
+  const [articles, setArticles] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
+  // جلب البيانات من Sanity
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // نستجلب الكتب مع رابط مباشر لملف الـ PDF إن وجد
+        const booksData = await client.fetch(`*[_type == "book"] | order(year desc) {
+          ...,
+          "pdfUrl": pdfFile.asset->url
+        }`);
+        const articlesData = await client.fetch('*[_type == "article"] | order(date desc)');
+        
+        setBooks(booksData);
+        setArticles(articlesData);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("خطأ في جلب البيانات:", error);
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // التحكم بالروابط
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.replace('#', '') || 'home';
@@ -283,28 +317,38 @@ const App = () => {
 
   const navigateTo = (newPage) => { window.location.hash = newPage; };
 
+  // شاشة التحميل
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#fdfbf7]">
+        <div className="flex flex-col items-center gap-4 text-stone-600">
+          <Loader size={40} className="animate-spin text-amber-700" />
+          <p className="font-serif">جاري تجهيز المكتبة...</p>
+        </div>
+      </div>
+    );
+  }
+
   const renderContent = () => {
     switch (page) {
-      case 'home': return <HomePage setPage={navigateTo} setBook={setSelectedBook} />;
-      case 'books': return <BooksPage setPage={navigateTo} setBook={setSelectedBook} />;
-      case 'book-detail': return selectedBook ? <BookDetailView book={selectedBook} setPage={navigateTo} /> : <BooksPage setPage={navigateTo} setBook={setSelectedBook} />;
-      case 'articles': return <ArticlesPage setPage={navigateTo} setArticle={setSelectedArticle} searchQuery={searchQuery} />;
-      case 'article-detail': return selectedArticle ? <ArticleReader article={selectedArticle} setPage={navigateTo} /> : <ArticlesPage setPage={navigateTo} setArticle={setSelectedArticle} searchQuery={searchQuery} />;
+      case 'home': return <HomePage setPage={navigateTo} setBook={setSelectedBook} books={books} />;
+      case 'books': return <BooksPage setPage={navigateTo} setBook={setSelectedBook} books={books} />;
+      case 'book-detail': return selectedBook ? <BookDetailView book={selectedBook} setPage={navigateTo} /> : <BooksPage setPage={navigateTo} setBook={setSelectedBook} books={books} />;
+      case 'articles': return <ArticlesPage setPage={navigateTo} setArticle={setSelectedArticle} searchQuery={searchQuery} articles={articles} />;
+      case 'article-detail': return selectedArticle ? <ArticleReader article={selectedArticle} setPage={navigateTo} /> : <ArticlesPage setPage={navigateTo} setArticle={setSelectedArticle} searchQuery={searchQuery} articles={articles} />;
       case 'activities': return <div className="pt-40 text-center text-2xl font-serif">قسم الأنشطة واللقاءات الثقافية قيد التحديث...</div>;
-case 'about': return (
+      case 'about': return (
         <div className="pt-32 pb-20 max-w-4xl mx-auto px-4 animate-fade-in text-right font-sans">
           <h2 className="text-4xl font-bold text-stone-900 font-serif text-center mb-12 underline decoration-amber-200 underline-offset-8">الأديب بوسلهام عميمر: سيرة ومسيرة</h2>
           
           <div className="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-stone-100 space-y-10 leading-loose text-stone-800 text-lg">
             
-            {/* قسم التعريف العام */}
             <div className="border-r-4 border-amber-700 pr-4">
               <p className="font-serif text-xl text-stone-900 font-medium">
                 بوسلهام عميمر، كاتب ومربٍّ مغربي، كرس حياته لخدمة الفكر، الأدب، وقضايا التربية والتعليم. تميزت مسيرته بالعطاء المستمر والبحث الدؤوب عن الكلمة الصادقة والأثر البناء.
               </p>
             </div>
 
-            {/* المسار المهني والتربوي */}
             <div>
               <h3 className="text-2xl font-bold text-stone-900 font-serif mb-4 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-amber-700"></span> المسار المهني والتربوي
@@ -314,7 +358,6 @@ case 'about': return (
               </p>
             </div>
 
-            {/* العالم الأدبي والإبداعي */}
             <div>
               <h3 className="text-2xl font-bold text-stone-900 font-serif mb-4 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-amber-700"></span> العالم الأدبي والإبداعي
@@ -324,7 +367,6 @@ case 'about': return (
               </p>
             </div>
 
-            {/* العضوية والنشاط الثقافي */}
             <div>
               <h3 className="text-2xl font-bold text-stone-900 font-serif mb-4 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-amber-700"></span> النشاط الثقافي والمجتمعي
@@ -338,7 +380,7 @@ case 'about': return (
         </div>
       );
       case 'contact': return <div className="pt-40 text-center font-mono text-xl">contact@malaath.ma</div>;
-      default: return <HomePage setPage={navigateTo} />;
+      default: return <HomePage setPage={navigateTo} books={books} />;
     }
   };
 
