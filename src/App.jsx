@@ -291,32 +291,46 @@ const BooksPage = ({ setPage, setBook, books }) => (
   </div>
 );
 
-const BookDetailView = ({ book, setPage }) => (
-  <div className="pt-32 pb-20 max-w-6xl mx-auto px-4 animate-fade-in text-right">
-    <button onClick={() => setPage('books')} className="flex items-center gap-2 text-stone-500 mb-8 hover:text-stone-900 transition-colors"><ChevronRight size={20} /> العودة للمكتبة</button>
-    <div className="grid lg:grid-cols-12 gap-12 bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-stone-100">
-      <div className="lg:col-span-4 flex justify-center">
-        {book.coverImage ? <img src={urlFor(book.coverImage).url()} className="w-full max-w-xs rounded-lg shadow-2xl" alt={book.title} /> : <div className="w-full aspect-[2/3] bg-stone-800 rounded-lg shadow-2xl"></div>}
-      </div>
-      <div className="lg:col-span-8">
-        <span className="bg-amber-100 text-amber-800 text-xs font-bold px-4 py-1.5 rounded-full mb-4 inline-block">{book.category}</span>
-        <h1 className="text-4xl lg:text-5xl font-bold text-stone-900 font-serif mb-6 leading-tight">{book.title}</h1>
-        <p className="text-stone-700 mb-10 leading-relaxed whitespace-pre-line text-lg">{book.description || "لا يوجد وصف متوفر حالياً."}</p>
-        <div className="flex flex-col gap-8">
-          {book.pdfUrl && <a href={book.pdfUrl} target="_blank" rel="noreferrer" className="w-full md:w-1/2 bg-amber-700 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg hover:bg-amber-800 transition-colors"><Download size={20} /> تحميل نسخة PDF</a>}
-          {book.videoUrl && (
-            <div className="w-full">
-              <h3 className="text-xl font-bold mb-4 font-serif flex items-center gap-2">فيديو تعريفي <Video size={20}/></h3>
-              <div className="aspect-video w-full rounded-2xl overflow-hidden shadow-xl bg-black border border-stone-200">
-                <iframe className="w-full h-full" src={book.videoUrl} title="book video" frameBorder="0" allowFullScreen></iframe>
+const BookDetailView = ({ book, setPage }) => {
+  // استخدام الدالة لتحضير الرابط الصحيح
+  const embedVideoUrl = book.videoUrl ? getYouTubeEmbedUrl(book.videoUrl) : null;
+
+  return (
+    <div className="pt-32 pb-20 max-w-6xl mx-auto px-4 animate-fade-in text-right">
+      <button onClick={() => setPage('books')} className="flex items-center gap-2 text-stone-500 mb-8 hover:text-stone-900 transition-colors"><ChevronRight size={20} /> العودة للمكتبة</button>
+      <div className="grid lg:grid-cols-12 gap-12 bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-stone-100">
+        <div className="lg:col-span-4 flex justify-center">
+          {book.coverImage ? <img src={urlFor(book.coverImage).url()} className="w-full max-w-xs rounded-lg shadow-2xl" alt={book.title} /> : <div className="w-full aspect-[2/3] bg-stone-800 rounded-lg shadow-2xl"></div>}
+        </div>
+        <div className="lg:col-span-8">
+          <span className="bg-amber-100 text-amber-800 text-xs font-bold px-4 py-1.5 rounded-full mb-4 inline-block">{book.category}</span>
+          <h1 className="text-4xl lg:text-5xl font-bold text-stone-900 font-serif mb-6 leading-tight">{book.title}</h1>
+          <p className="text-stone-700 mb-10 leading-relaxed whitespace-pre-line text-lg">{book.description || "لا يوجد وصف متوفر حالياً."}</p>
+          <div className="flex flex-col gap-8">
+            {book.pdfUrl && <a href={book.pdfUrl} target="_blank" rel="noreferrer" className="w-full md:w-1/2 bg-amber-700 text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg hover:bg-amber-800 transition-colors"><Download size={20} /> تحميل نسخة PDF</a>}
+            
+            {/* عرض الفيديو باستخدام الرابط المعدل */}
+            {embedVideoUrl && (
+              <div className="w-full">
+                <h3 className="text-xl font-bold mb-4 font-serif flex items-center gap-2">فيديو تعريفي <Video size={20}/></h3>
+                <div className="aspect-video w-full rounded-2xl overflow-hidden shadow-xl bg-black border border-stone-200">
+                  <iframe 
+                    className="w-full h-full" 
+                    src={embedVideoUrl} 
+                    title={book.title} 
+                    frameBorder="0" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowFullScreen
+                  ></iframe>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const ArticlesPage = ({ setPage, setArticle, searchQuery, articles }) => {
   const filtered = (articles || []).filter(a => a.title?.toLowerCase().includes(searchQuery.toLowerCase()));
@@ -343,6 +357,18 @@ const renderSanityText = (blocks) => {
   if (typeof blocks === 'string') return blocks;
   if (!Array.isArray(blocks)) return "المحتوى الكامل غير متوفر حالياً.";
   return blocks.map(block => block.children ? block.children.map(child => child.text).join('') : '').join('\n\n');
+};
+
+// دالة مساعدة لتحويل رابط يوتيوب العادي إلى رابط تضمين (Embed)
+const getYouTubeEmbedUrl = (url) => {
+  if (!url) return null;
+  // البحث عن معرف الفيديو (ID) داخل الرابط سواء كان طويلاً أو قصيراً
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  if (match && match[2].length === 11) {
+    return `https://www.youtube.com/embed/${match[2]}`;
+  }
+  return url; 
 };
 
 const ArticleReader = ({ article, setPage }) => (
